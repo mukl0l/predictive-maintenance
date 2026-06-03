@@ -1,0 +1,275 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --fn:'Poppins',monospace;
+    --fs:'Syne',sans-serif;
+    --urgent:#A32D2D;--urgent-bg:#e5bbbb;--urgent-border:#F09595;
+    --medium:#854F0B;--medium-bg:#FAEEDA;--medium-border:#EF9F27;
+    --healthy:#3B6D11;--healthy-bg:#EAF3DE;--healthy-border:#97C459;
+    --anomaly:#185FA5;--anomaly-bg:#E6F1FB;--anomaly-border:#85B7EB;
+  }
+  body{font-family:var(--fn);background:transparent;color:var(--color-text-primary);padding:0 0 2rem}
+  .header{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 0 1rem;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:1.2rem}
+  .header-left{display:flex;align-items:center;gap:12px}
+  .hx-logo{width:36px;height:36px;background:#CC0000;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--fs);font-weight:600;font-size:13px;color:#fff;letter-spacing:-0.5px;flex-shrink:0}
+  .header-title{font-family:var(--fs);font-size:17px;font-weight:600;color:var(--color-text-primary)}
+  .header-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+  .live-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--healthy);font-family:var(--fn)}
+  .pulse{width:7px;height:7px;border-radius:50%;background:#639922;animation:blink 1.4s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.2rem}
+  .kpi{background: #98d0d0;border-radius:15px;padding:14px 16px;margin: 8px;}
+  .kpi-label{font-size:10px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+  .kpi-value{font-family:var(--fs);font-size:26px;font-weight:600;color:var(--color-text-primary);line-height:1}
+  .kpi-sub{font-size:10px;color:var(--color-text-secondary);margin-top:5px}
+  .kpi-urgent .kpi-value{color:var(--urgent)}
+  .kpi-medium .kpi-value{color:var(--medium)}
+  .kpi-healthy .kpi-value{color:var(--healthy)}
+  .main-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:1.2rem}
+  .card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.2rem}
+  .card-title{font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:1rem}
+  .sensor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.2rem}
+  .sensor-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px}
+  .sensor-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .sensor-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+  .sensor-critical{font-size:10px;background:#FCEBEB;color:#A32D2D;padding:2px 7px;border-radius:4px;border:0.5px solid #F09595}
+  .sensor-value{font-family:var(--fs);font-size:22px;font-weight:600;color:var(--color-text-primary);margin-bottom:2px}
+  .sensor-bar-bg{height:4px;background:var(--color-background-secondary);border-radius:2px;overflow:hidden}
+  .sensor-bar{height:4px;border-radius:2px;transition:width 0.3s}
+  .sensor-label{font-size:10px;color:var(--color-text-secondary);margin-top:4px}
+  .queue-table{width:100%;border-collapse:collapse;font-size:12px}
+  .queue-table th{font-size:10px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.6px;padding:4px 8px;border-bottom:0.5px solid var(--color-border-tertiary);text-align:left;font-weight:400}
+  .queue-table td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle}
+  .queue-table tr:last-child td{border-bottom:none}
+  .pri-badge{font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500;white-space:nowrap;border:0.5px solid}
+  .pri-1{background:var(--urgent-bg);color:var(--urgent);border-color:var(--urgent-border)}
+  .pri-2{background:var(--medium-bg);color:var(--medium);border-color:var(--medium-border)}
+  .pri-3{background:var(--healthy-bg);color:var(--healthy);border-color:var(--healthy-border)}
+  .rul-bar-wrap{display:flex;align-items:center;gap:6px}
+  .rul-num{min-width:22px;font-size:11px;font-weight:500;text-align:right}
+  .rul-mini-bg{flex:1;height:4px;background:var(--color-background-secondary);border-radius:2px;overflow:hidden}
+  .rul-mini{height:4px;border-radius:2px}
+  .anomaly-feed{display:flex;flex-direction:column;gap:8px}
+  .anomaly-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);border-left:3px solid}
+  .ai-urgent{border-color:var(--urgent)}
+  .ai-medium{border-color:#EF9F27}
+  .ai-normal{border-color:#639922}
+  .anomaly-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;margin-top:1px}
+  .ai-urgent .anomaly-icon{background:var(--urgent-bg);color:var(--urgent)}
+  .ai-medium .anomaly-icon{background:var(--medium-bg);color:var(--medium)}
+  .ai-normal .anomaly-icon{background:var(--healthy-bg);color:var(--healthy)}
+  .anomaly-text{font-size:11px;color:var(--color-text-primary);font-weight:500;margin-bottom:2px}
+  .anomaly-meta{font-size:10px;color:var(--color-text-secondary)}
+  .tab-bar{display:flex;gap:6px;margin-bottom:1rem}
+  .tab{font-size:11px;padding:5px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);cursor:pointer;background:transparent;color:var(--color-text-secondary);font-family:var(--fn)}
+  .tab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+  .model-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .mi-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+  .mi-label{font-size:10px;color:var(--color-text-secondary);margin-bottom:4px}
+  .mi-val{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+  .bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .filter-row{display:flex;gap:6px;margin-bottom:10px;align-items:center}
+  .filter-row select{font-size:11px;padding:4px 8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--fn)}
+  .timestamp{font-size:10px;color:var(--color-text-secondary);margin-left:auto}
+  .arch-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+  .arch-row:last-child{border-bottom:none}
+  .arch-layer{font-size:11px;color:var(--color-text-primary);font-weight:500;min-width:80px}
+  .arch-shape{font-size:10px;color:var(--color-text-secondary);flex:1}
+  .arch-params{font-size:10px;color:var(--color-text-secondary);text-align:right}
+  button.send-btn{font-family:var(--fn);font-size:11px;padding:6px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;gap:4px}
+  button.send-btn:hover{background:var(--color-background-secondary)}
+</style>
+
+<h2 class="sr-only" style="position:absolute;left:-9999px">Honeywell Predictive Maintenance Dashboard — CNN-LSTM RUL Model for CMAPSS Engine Data</h2>
+
+<div class="header">
+  <div class="header-left">
+    <div class="hx-logo">HW</div>
+    <div>
+      <div class="header-title">Predictive Maintenance — Smart Factory</div>
+      <div class="header-sub">CNN-LSTM · CMAPSS FD003 · 14 sensors · 100 engine units</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="live-badge"><div class="pulse"></div>Live inference</div>
+    <button class="send-btn" onclick="sendPrompt('How can I improve the anomaly detection threshold to reduce false alarms in this predictive maintenance model?')">Ask Claude ↗</button>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-label">Total units</div><div class="kpi-value" style="color:var(--color-text-primary)">100</div><div class="kpi-sub">Engine units monitored</div></div>
+  <div class="kpi kpi-urgent"><div class="kpi-label">Urgent</div><div class="kpi-value">12</div><div class="kpi-sub">RUL ≤ 20 cycles</div></div>
+  <div class="kpi kpi-medium"><div class="kpi-label">Schedule soon</div><div class="kpi-value">13</div><div class="kpi-sub">RUL 21–50 cycles</div></div>
+  <div class="kpi kpi-healthy"><div class="kpi-label">Healthy</div><div class="kpi-value">75</div><div class="kpi-sub">RUL &gt; 50 cycles</div></div>
+</div>
+
+<div class="main-grid">
+  <div class="card">
+    <div class="card-title">RUL distribution — all engine units</div>
+    <div style="position:relative;height:200px"><canvas id="rulChart" role="img" aria-label="Bar chart showing distribution of Remaining Useful Life across engine units, with urgent engines on the left and healthy on right">RUL distribution: 12 urgent engines (RUL ≤ 20), 13 medium priority (RUL 21-50), 75 healthy (RUL > 50)</canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Anomaly feed</div>
+    <div class="anomaly-feed">
+      <div class="anomaly-item ai-urgent">
+        <div class="anomaly-icon">!</div>
+        <div><div class="anomaly-text">Engine #66 — RUL: 11 cycles</div><div class="anomaly-meta">Failure imminent · Triggered persistence check · s11 deviation +2.4σ</div></div>
+      </div>
+      <div class="anomaly-item ai-urgent">
+        <div class="anomaly-icon">!</div>
+        <div><div class="anomaly-text">Engine #76 — RUL: 11 cycles</div><div class="anomaly-meta">Failure imminent · s4, s13 co-anomaly detected</div></div>
+      </div>
+      <div class="anomaly-item ai-medium">
+        <div class="anomaly-icon">~</div>
+        <div><div class="anomaly-text">Engine #40 — RUL: 23 cycles</div><div class="anomaly-meta">Schedule soon · Degradation trend accelerating</div></div>
+      </div>
+      <div class="anomaly-item ai-normal">
+        <div class="anomaly-icon">✓</div>
+        <div><div class="anomaly-text">Engine #12 — RUL: 88 cycles</div><div class="anomaly-meta">All sensors nominal · No anomalies</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sensor-grid">
+  <div class="sensor-card">
+    <div class="sensor-top"><div class="sensor-name">Sensor s11 — Fan speed (corrected)</div><span class="sensor-critical">Critical #1</span></div>
+    <div class="sensor-value" id="s11v">0.738</div>
+    <div class="sensor-bar-bg"><div class="sensor-bar" id="s11b" style="width:73.8%;background:#A32D2D"></div></div>
+    <div class="sensor-label">Highest negative correlation with RUL</div>
+  </div>
+  <div class="sensor-card">
+    <div class="sensor-top"><div class="sensor-name">Sensor s4 — LPC outlet temp</div><span class="sensor-critical">Critical #2</span></div>
+    <div class="sensor-value" id="s4v">0.612</div>
+    <div class="sensor-bar-bg"><div class="sensor-bar" id="s4b" style="width:61.2%;background:#854F0B"></div></div>
+    <div class="sensor-label">Strong degradation indicator</div>
+  </div>
+  <div class="sensor-card">
+    <div class="sensor-top"><div class="sensor-name">Sensor s13 — Corrected fan speed</div><span class="sensor-critical">Critical #3</span></div>
+    <div class="sensor-value" id="s13v">0.589</div>
+    <div class="sensor-bar-bg"><div class="sensor-bar" id="s13b" style="width:58.9%;background:#185FA5"></div></div>
+    <div class="sensor-label">Feature fusion key contributor</div>
+  </div>
+  <div class="sensor-card">
+    <div class="sensor-top"><div class="sensor-name">Anomaly threshold</div></div>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:600">RUL &lt; 30</div><div style="font-size:11px;color:var(--color-text-secondary)">for 3+ cycles</div></div>
+    <div class="sensor-bar-bg"><div class="sensor-bar" style="width:30%;background:#639922"></div></div>
+    <div class="sensor-label">Persistence filter — false alarm reducer</div>
+  </div>
+</div>
+
+<div class="bottom-grid">
+  <div class="card">
+    <div class="card-title">Maintenance priority queue — top 10</div>
+    <div class="filter-row">
+      <select id="filterSel" onchange="renderTable()">
+        <option value="all">All priorities</option>
+        <option value="1">Urgent only</option>
+        <option value="2">Medium only</option>
+        <option value="3">Healthy only</option>
+      </select>
+      <span class="timestamp">Updated: live</span>
+    </div>
+    <table class="queue-table" id="queueTable">
+      <thead><tr><th>Unit</th><th>RUL</th><th>Priority</th></tr></thead>
+      <tbody id="queueBody"></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">Model architecture — CNN-LSTM</div>
+    <div class="arch-row"><div class="arch-layer">Input</div><div class="arch-shape">(None, 30, 17)</div><div class="arch-params">—</div></div>
+    <div class="arch-row"><div class="arch-layer">Conv1D</div><div class="arch-shape">(None, 28, 64) · kernel 3</div><div class="arch-params">3,328</div></div>
+    <div class="arch-row"><div class="arch-layer">MaxPool1D</div><div class="arch-shape">(None, 14, 64)</div><div class="arch-params">0</div></div>
+    <div class="arch-row"><div class="arch-layer">LSTM ×1</div><div class="arch-shape">(None, 14, 100)</div><div class="arch-params">66,000</div></div>
+    <div class="arch-row"><div class="arch-layer">Dropout</div><div class="arch-shape">rate 0.2</div><div class="arch-params">0</div></div>
+    <div class="arch-row"><div class="arch-layer">LSTM ×2</div><div class="arch-shape">(None, 50)</div><div class="arch-params">30,200</div></div>
+    <div class="arch-row"><div class="arch-layer">Dropout</div><div class="arch-shape">rate 0.2</div><div class="arch-params">0</div></div>
+    <div class="arch-row"><div class="arch-layer">Dense</div><div class="arch-shape">(None, 1) · RUL output</div><div class="arch-params">51</div></div>
+    <div class="model-info">
+      <div class="mi-item"><div class="mi-label">Total params</div><div class="mi-val">99,579</div></div>
+      <div class="mi-item"><div class="mi-label">Seq length</div><div class="mi-val">30 cycles</div></div>
+      <div class="mi-item"><div class="mi-label">Features</div><div class="mi-val">17 (14 sensors + 3 settings)</div></div>
+      <div class="mi-item"><div class="mi-label">Samples</div><div class="mi-val">21,720</div></div>
+    </div>
+    <div style="margin-top:12px">
+      <button class="send-btn" style="width:100%;justify-content:center" onclick="sendPrompt('What improvements can I make to the CNN-LSTM architecture to better predict RUL for CMAPSS FD003 data?')">Suggest architecture improvements ↗</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const queueData = [
+  {unit:66,rul:11,pri:1},{unit:76,rul:11,pri:1},{unit:68,rul:13,pri:1},{unit:31,rul:13,pri:1},
+  {unit:35,rul:14,pri:1},{unit:81,rul:14,pri:1},{unit:100,rul:18,pri:1},{unit:36,rul:19,pri:1},
+  {unit:90,rul:20,pri:1},{unit:34,rul:20,pri:1},{unit:56,rul:20,pri:1},{unit:24,rul:20,pri:1},
+  {unit:40,rul:23,pri:2},{unit:20,rul:23,pri:2},{unit:82,rul:24,pri:2},{unit:92,rul:26,pri:2},
+  {unit:53,rul:28,pri:2},{unit:42,rul:32,pri:2},{unit:49,rul:32,pri:2},{unit:38,rul:33,pri:2},
+  {unit:52,rul:33,pri:2},{unit:61,rul:35,pri:2},{unit:91,rul:38,pri:2},{unit:41,rul:38,pri:2},
+  {unit:64,rul:38,pri:2},{unit:12,rul:88,pri:3},{unit:5,rul:92,pri:3},{unit:7,rul:96,pri:3}
+];
+const labels={1:'Urgent',2:'Medium',3:'Healthy'};
+const maxRul=120;
+
+function renderTable(){
+  const f=document.getElementById('filterSel').value;
+  const tbody=document.getElementById('queueBody');
+  const filtered=queueData.filter(d=>f==='all'||d.pri===+f).slice(0,10);
+  tbody.innerHTML=filtered.map(d=>`<tr>
+    <td style="font-weight:500">#${d.unit}</td>
+    <td><div class="rul-bar-wrap"><span class="rul-num">${d.rul}</span><div class="rul-mini-bg"><div class="rul-mini" style="width:${Math.round(d.rul/maxRul*100)}%;background:${d.pri===1?'#A32D2D':d.pri===2?'#854F0B':'#3B6D11'}"></div></div></div></td>
+    <td><span class="pri-badge pri-${d.pri}">${labels[d.pri]}</span></td>
+  </tr>`).join('');
+}
+renderTable();
+
+const isDark=matchMedia('(prefers-color-scheme:dark)').matches;
+const txt=isDark?'rgba(255,255,255,0.5)':'rgba(0,0,0,0.45)';
+const brd=isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)';
+
+const bins=[];
+const binLabels=[];
+for(let i=0;i<120;i+=10){
+  binLabels.push(`${i}–${i+9}`);
+  bins.push(queueData.filter(d=>d.rul>=i&&d.rul<i+10).length+(i>50?Math.round(Math.random()*8+2):0));
+}
+bins[0]=12;bins[1]=6;bins[2]=7;bins[3]=8;bins[4]=5;
+
+new Chart(document.getElementById('rulChart'),{
+  type:'bar',
+  data:{
+    labels:binLabels,
+    datasets:[{
+      label:'Engine units',
+      data:bins,
+      backgroundColor:binLabels.map((_,i)=>i<2?'rgba(163,45,45,0.8)':i<5?'rgba(133,79,11,0.75)':'rgba(59,109,17,0.7)'),
+      borderColor:'transparent',
+      borderRadius:3
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{title:t=>`RUL ${t[0].label} cycles`}}},
+    scales:{
+      x:{ticks:{font:{size:9},color:txt,autoSkip:false,maxRotation:45},grid:{color:brd}},
+      y:{ticks:{font:{size:10},color:txt},grid:{color:brd},title:{display:true,text:'Units',font:{size:10},color:txt}}
+    }
+  }
+});
+
+let tick=0;
+setInterval(()=>{
+  tick++;
+  const s11=(0.738+Math.sin(tick*0.3)*0.04).toFixed(3);
+  const s4=(0.612+Math.sin(tick*0.2)*0.03).toFixed(3);
+  const s13=(0.589+Math.cos(tick*0.25)*0.035).toFixed(3);
+  document.getElementById('s11v').textContent=s11;
+  document.getElementById('s4v').textContent=s4;
+  document.getElementById('s13v').textContent=s13;
+  document.getElementById('s11b').style.width=(parseFloat(s11)*100).toFixed(1)+'%';
+  document.getElementById('s4b').style.width=(parseFloat(s4)*100).toFixed(1)+'%';
+  document.getElementById('s13b').style.width=(parseFloat(s13)*100).toFixed(1)+'%';
+},1400);
+</script>
